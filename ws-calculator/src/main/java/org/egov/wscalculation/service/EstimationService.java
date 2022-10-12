@@ -326,11 +326,11 @@ public class EstimationService {
 					+isConnectionTypeMatching+" isCalculationAttributeMatching: "+isCalculationAttributeMatching + 
 					" isWaterSubUsageType: "+waterSubUsageType);
 
-			if (waterSubUsageType != null) {
-				boolean isWaterSubUsageType = slab.getWaterSubUsageType().equalsIgnoreCase(waterSubUsageType);
-				return isBuildingTypeMatching && isConnectionTypeMatching && isCalculationAttributeMatching
-						&& isWaterSubUsageType;
-			}
+// 			if (waterSubUsageType != null) {
+// 				boolean isWaterSubUsageType = slab.getWaterSubUsageType().equalsIgnoreCase(waterSubUsageType);
+// 				return isBuildingTypeMatching && isConnectionTypeMatching && isCalculationAttributeMatching
+// 						&& isWaterSubUsageType;
+// 			}
 			return isBuildingTypeMatching && isConnectionTypeMatching && isCalculationAttributeMatching;
 		}).collect(Collectors.toList());
 	}
