@@ -443,6 +443,9 @@ public class TradeLicenseService {
 
     public List<TradeLicense> plainSearch(TradeLicenseSearchCriteria criteria, RequestInfo requestInfo){
 
+	log.info("from Date ::: "+criteria.getFromDate()+" to date ::: "+ criteria.getToDate()+" tenant info "+criteria.getTenantId());
+	  
+	    
         if(criteria.getLimit() == null)
             criteria.setLimit(config.getDefaultLimit());
 
@@ -452,7 +455,7 @@ public class TradeLicenseService {
         List<String> ids = repository.fetchTradeLicenseIds(criteria);
         if (ids.isEmpty())
             return Collections.emptyList();
-        System.out.println("plainSearch ids :: "+ids.size() );
+       
         TradeLicenseSearchCriteria newCriteria = TradeLicenseSearchCriteria.builder().ids(ids).build();
         System.out.println("plainSearch newCriteria :: "+ newCriteria.toString() );
         
