@@ -120,9 +120,13 @@ public class WorkflowService {
 			String pId = utils.getIdList(request.getRequestInfo(), property.getTenantId(), configs.getPropertyIdGenName(), configs.getPropertyIdGenFormat(), 1).get(0);
 			request.getProperty().setPropertyId(pId);
 		}
-		if(request.getProperty().getCreationReason().equals(CreationReason.STATUS) && request.getProperty().getWorkflow().getAction().equalsIgnoreCase("APPROVE"))
+		if(request.getProperty().getCreationReason().equals(CreationReason.STATUS) && request.getProperty().getWorkflow().getAction().equalsIgnoreCase("APPROVE") && request.getProperty().getStatus().equals(Status.ACTIVE))
 		{	
 			request.getProperty().setStatus(Status.INACTIVE);
+		}
+		else if (request.getProperty().getCreationReason().equals(CreationReason.STATUS) && request.getProperty().getWorkflow().getAction().equalsIgnoreCase("APPROVE") && request.getProperty().getStatus().equals(Status.INACTIVE))
+		{	
+			request.getProperty().setStatus(Status.ACTIVE);
 		}
 		else
 		request.getProperty().setStatus(Status.fromValue(state.getApplicationStatus()));
