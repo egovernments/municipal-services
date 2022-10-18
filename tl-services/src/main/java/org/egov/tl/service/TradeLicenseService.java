@@ -33,7 +33,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import static org.egov.tl.util.TLConstants.*;
 
 import lombok.extern.slf4j.Slf4j;
-
+import org.springframework.util.CollectionUtils;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -464,6 +464,8 @@ public class TradeLicenseService {
         
         List<TradeLicense> licenses = repository.getPlainLicenseSearch(newCriteria);
 	     System.out.println("plainSearch TradeLicense count ***********  :: "+ licenses.size() );
+	    
+	if(!CollectionUtils.isEmpty(licenses))
         licenses = enrichmentService.enrichTradeLicenseSearch(licenses,newCriteria,requestInfo);
 	     System.out.println("plainSearch enrichmentService licenses count ***********  :: "+ licenses.size() );
         return licenses;
