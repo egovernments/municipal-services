@@ -89,10 +89,16 @@ import javax.servlet.http.HttpServletRequest;
 
     @RequestMapping(value="/_plainsearch", method = RequestMethod.POST)
     public ResponseEntity<TradeLicenseResponse> plainsearch(@Valid @RequestBody RequestInfoWrapper requestInfoWrapper,
-                                                            @Valid @ModelAttribute TradeLicenseSearchCriteria criteria){
+                                                            @Valid @ModelAttribute TradeLicenseSearchCriteria criteria ,@RequestParam(value = "fromDate", required = false) Long fromDate,@RequestParam(value = "toDate", required = false) Long toDate){
 
+    	if((fromDate !=null && fromDate >0) && (toDate !=null && toDate >0)) {
+    		criteria.setFromDate(fromDate);
+    		criteria.setToDate(toDate);
+    		
+    	}
         List<TradeLicense> licenses = tradeLicenseService.plainSearch(criteria,requestInfoWrapper.getRequestInfo());
 
+        
         TradeLicenseResponse response = TradeLicenseResponse.builder().licenses(licenses).responseInfo(
                 responseInfoFactory.createResponseInfoFromRequestInfo(requestInfoWrapper.getRequestInfo(), true))
                 .build();

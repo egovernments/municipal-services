@@ -170,6 +170,12 @@ public class TLRepository {
         	query=query+" where tenantid= '"+criteria.getTenantId()+"'";
         }
         
+        if(!StringUtils.isEmpty(criteria.getTenantId()) && (criteria.getFromDate()!=null && criteria.getFromDate()>0) && (criteria.getToDate()!=null && criteria.getToDate()>0) ) {
+        	query=query+" AND  createdtime between "+ criteria.getFromDate()+" AND "+criteria.getToDate();
+        }else  if((criteria.getFromDate()!=null && criteria.getFromDate()>0) && (criteria.getToDate()!=null && criteria.getToDate()>0)){
+        	query=query+" where createdtime between "+ criteria.getFromDate()+" AND "+criteria.getToDate();
+        }
+        
         query=query+" ORDER BY createdtime offset " +
                 " ? " +
                 " limit ? ";

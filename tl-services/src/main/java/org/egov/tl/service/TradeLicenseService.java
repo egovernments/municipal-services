@@ -24,6 +24,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
+
 import static org.egov.tracer.http.HttpUtils.isInterServiceCall;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -451,6 +453,8 @@ public class TradeLicenseService {
 
         if (criteria.getLimit() != null && criteria.getLimit() > config.getMaxSearchLimit())
             criteria.setLimit(config.getMaxSearchLimit());
+        
+        System.out.println("offset --> :: "+ criteria.getOffset()+"  Limit---->"+criteria.getLimit()); 
 
         List<String> ids = repository.fetchTradeLicenseIds(criteria);
         if (ids.isEmpty())
@@ -461,7 +465,8 @@ public class TradeLicenseService {
         
         List<TradeLicense> licenses = repository.getPlainLicenseSearch(newCriteria);
 	     System.out.println("plainSearch TradeLicense count ***********  :: "+ licenses.size() );
-        licenses = enrichmentService.enrichTradeLicenseSearch(licenses,newCriteria,requestInfo);
+	    if(!CollectionUtils.isEmpty(licenses))
+         licenses = enrichmentService.enrichTradeLicenseSearch(licenses,newCriteria,requestInfo);
 	     System.out.println("plainSearch enrichmentService licenses count ***********  :: "+ licenses.size() );
         return licenses;
     }
