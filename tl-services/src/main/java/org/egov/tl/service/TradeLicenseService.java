@@ -452,6 +452,9 @@ public class TradeLicenseService {
         if (criteria.getLimit() != null && criteria.getLimit() > config.getMaxSearchLimit())
             criteria.setLimit(config.getMaxSearchLimit());
 
+	    System.out.println("offset --> :: "+ criteria.getOffset()+"  Limit---->"+criteria.getLimit()); 
+
+	    
         List<String> ids = repository.fetchTradeLicenseIds(criteria);
         if (ids.isEmpty())
             return Collections.emptyList();
