@@ -275,10 +275,9 @@ public class EnrichmentService {
         Set<String> ownerids = new HashSet<>();
         licenses.forEach(license -> {
         	if(license.getTradeLicenseDetail()!=null) {
-        		if(!CollectionUtils.isEmpty(license.getTradeLicenseDetail().getOwners())) {
         			System.out.println("license id :::: "+license.getLicenseNumber());
         			 license.getTradeLicenseDetail().getOwners().forEach(owner -> ownerids.add(owner.getUuid()));
-        		}
+        		
         		  
         	}
          
