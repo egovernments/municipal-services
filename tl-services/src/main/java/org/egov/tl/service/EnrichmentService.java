@@ -274,7 +274,14 @@ public class EnrichmentService {
         searchCriteria.setTenantId(criteria.getTenantId());
         Set<String> ownerids = new HashSet<>();
         licenses.forEach(license -> {
-            license.getTradeLicenseDetail().getOwners().forEach(owner -> ownerids.add(owner.getUuid()));
+        	if(license.getTradeLicenseDetail()!=null) {
+        		if(!CollectionUtils.isEmpty(license.getTradeLicenseDetail().getOwners())) {
+        			System.out.println("license id :::: "+license.getLicenseNumber());
+        			 license.getTradeLicenseDetail().getOwners().forEach(owner -> ownerids.add(owner.getUuid()));
+        		}
+        		  
+        	}
+         
         });
 
       /*  licenses.forEach(tradeLicense -> {
@@ -559,7 +566,7 @@ public class EnrichmentService {
         String businessService = licenses.isEmpty()?null:licenses.get(0).getBusinessService();
         if (businessService == null)
             businessService = businessService_TL;
-        TradeLicenseSearchCriteria searchCriteria = enrichTLSearchCriteriaWithOwnerids(criteria,licenses);
+         TradeLicenseSearchCriteria searchCriteria = enrichTLSearchCriteriaWithOwnerids(criteria,licenses);
         switch (businessService) {
             case businessService_TL:
                 enrichBoundary(new TradeLicenseRequest(requestInfo, licenses));
