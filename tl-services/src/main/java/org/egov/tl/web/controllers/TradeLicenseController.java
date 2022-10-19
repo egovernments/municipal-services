@@ -8,6 +8,8 @@ import org.egov.tl.util.ResponseInfoFactory;
 import org.egov.tl.web.models.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.annotations.*;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -22,7 +24,8 @@ import javax.validation.constraints.*;
 import javax.validation.Valid;
 import javax.servlet.http.HttpServletRequest;
 
-@RestController
+    @Slf4j
+    @RestController
     @RequestMapping("/v1")
     public class TradeLicenseController {
 
@@ -90,7 +93,8 @@ import javax.servlet.http.HttpServletRequest;
     @RequestMapping(value="/_plainsearch", method = RequestMethod.POST)
     public ResponseEntity<TradeLicenseResponse> plainsearch(@Valid @RequestBody RequestInfoWrapper requestInfoWrapper,
                                                             @Valid @ModelAttribute TradeLicenseSearchCriteria criteria ,@RequestParam(value = "fromDate", required = false) Long fromDate,@RequestParam(value = "toDate", required = false) Long toDate){
-
+       
+    	log.info("tl controller fromDate"+fromDate+ " todate :"+toDate);
     	if((fromDate !=null && fromDate >0) && (toDate !=null && toDate >0)) {
     		criteria.setFromDate(fromDate);
     		criteria.setToDate(toDate);
