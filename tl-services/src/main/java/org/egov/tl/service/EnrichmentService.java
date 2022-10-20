@@ -276,13 +276,13 @@ public class EnrichmentService {
 		Set<String> ownerids = new HashSet<>();
 		licenses.forEach(license -> {
 			if (license.getTradeLicenseDetail() != null) {
-				System.out.println("license id :::: " + license.getLicenseNumber());
+				System.out.println("license  :::: " + license.toString());
 				try {
 				if (!CollectionUtils.isEmpty(license.getTradeLicenseDetail().getOwners())) {
 					try {
 						List<OwnerInfo> ownerInfos = license.getTradeLicenseDetail().getOwners();
 						for (OwnerInfo owner : ownerInfos) {
-							ownerids.add(owner.getUuid());
+ 							ownerids.add(owner.getUuid());
 						}
 					} catch (Exception e) {
 						System.out.println("Exception  enrichTLSearchCriteriaWithOwnerids ::" + e.getMessage());
