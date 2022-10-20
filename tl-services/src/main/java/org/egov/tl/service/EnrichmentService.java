@@ -277,6 +277,7 @@ public class EnrichmentService {
 		licenses.forEach(license -> {
 			if (license.getTradeLicenseDetail() != null) {
 				System.out.println("license id :::: " + license.getLicenseNumber());
+				try {
 				if (!CollectionUtils.isEmpty(license.getTradeLicenseDetail().getOwners())) {
 					try {
 						List<OwnerInfo> ownerInfos = license.getTradeLicenseDetail().getOwners();
@@ -287,6 +288,9 @@ public class EnrichmentService {
 						System.out.println("Exception  enrichTLSearchCriteriaWithOwnerids ::" + e.getMessage());
 					}
 
+				}
+				}catch(Exception e) {
+					System.out.println("Exception Owner info  enrichTLSearchCriteriaWithOwnerids ::" + e.getMessage());
 				}
 
 			}
