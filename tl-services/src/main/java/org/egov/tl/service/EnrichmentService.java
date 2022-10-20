@@ -14,6 +14,8 @@ import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
+
 import com.jayway.jsonpath.JsonPath;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -282,7 +284,12 @@ public class EnrichmentService {
 					try {
 						List<OwnerInfo> ownerInfos = license.getTradeLicenseDetail().getOwners();
 						for (OwnerInfo owner : ownerInfos) {
- 							ownerids.add(owner.getUuid());
+							if(!StringUtils.isEmpty(owner.getUuid()))
+ 							  ownerids.add(owner.getUuid());
+ 							else
+							  System.out.println(" Owner id is NUll for ::"+license.getTradeLicenseDetail().getId());
+
+ 							
 						}
 					} catch (Exception e) {
 						System.out.println("Exception  enrichTLSearchCriteriaWithOwnerids ::" + e.getMessage());
@@ -585,8 +592,13 @@ public class EnrichmentService {
                 enrichBoundary(new TradeLicenseRequest(requestInfo, licenses));
                 break;
         }
-        UserDetailResponse userDetailResponse = userService.getUser(searchCriteria,requestInfo);
-        enrichOwner(userDetailResponse,licenses);
+       
+        try{
+        	UserDetailResponse userDetailResponse = userService.getUser(searchCriteria,requestInfo);
+            enrichOwner(userDetailResponse,licenses);
+        }catch(Exception e) {
+        	System.out.println("enrichTradeLicenseSearch :: "+e.getMessage());
+        }
         return licenses;
     }
 
