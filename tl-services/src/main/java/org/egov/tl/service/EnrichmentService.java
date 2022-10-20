@@ -269,19 +269,29 @@ public class EnrichmentService {
      * @param criteria TradeLicense search criteria
      * @param licenses The tradeLicense whose owners are to be enriched
      */
-    public TradeLicenseSearchCriteria enrichTLSearchCriteriaWithOwnerids(TradeLicenseSearchCriteria criteria, List<TradeLicense> licenses) {
-        TradeLicenseSearchCriteria searchCriteria = new TradeLicenseSearchCriteria();
-        searchCriteria.setTenantId(criteria.getTenantId());
-        Set<String> ownerids = new HashSet<>();
-        licenses.forEach(license -> {
-        	if(license.getTradeLicenseDetail()!=null) {
-        			System.out.println("license id :::: "+license.getLicenseNumber());
-        			 license.getTradeLicenseDetail().getOwners().forEach(owner -> ownerids.add(owner.getUuid()));
-        		
-        		  
-        	}
-         
-        });
+	public TradeLicenseSearchCriteria enrichTLSearchCriteriaWithOwnerids(TradeLicenseSearchCriteria criteria,
+			List<TradeLicense> licenses) {
+		TradeLicenseSearchCriteria searchCriteria = new TradeLicenseSearchCriteria();
+		searchCriteria.setTenantId(criteria.getTenantId());
+		Set<String> ownerids = new HashSet<>();
+		licenses.forEach(license -> {
+			if (license.getTradeLicenseDetail() != null) {
+				System.out.println("license id :::: " + license.getLicenseNumber());
+				if (!CollectionUtils.isEmpty(license.getTradeLicenseDetail().getOwners())) {
+					try {
+						List<OwnerInfo> ownerInfos = license.getTradeLicenseDetail().getOwners();
+						for (OwnerInfo owner : ownerInfos) {
+							ownerids.add(owner.getUuid());
+						}
+					} catch (Exception e) {
+						System.out.println("Exception  enrichTLSearchCriteriaWithOwnerids ::" + e.getMessage());
+					}
+
+				}
+
+			}
+
+		});
 
       /*  licenses.forEach(tradeLicense -> {
             ownerids.add(tradeLicense.getCitizenInfo().getUuid());
