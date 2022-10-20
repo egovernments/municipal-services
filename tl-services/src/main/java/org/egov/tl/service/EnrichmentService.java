@@ -276,7 +276,7 @@ public class EnrichmentService {
 		Set<String> ownerids = new HashSet<>();
 		licenses.forEach(license -> {
 			if (license.getTradeLicenseDetail() != null) {
-				System.out.println("license  :::: " + license.toString());
+				System.out.println("license  :::: " + license.getId()+"  license Number:: "+license.getLicenseNumber()+" Application Number:: "+license.getApplicationNumber());
 				try {
 				if (!CollectionUtils.isEmpty(license.getTradeLicenseDetail().getOwners())) {
 					try {
