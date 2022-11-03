@@ -10,6 +10,7 @@ import org.egov.pt.service.NotificationService;
 import org.egov.pt.util.PTConstants;
 import org.egov.pt.web.contracts.AssessmentRequest;
 import org.egov.pt.web.contracts.PropertyRequest;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.KafkaHeaders;
@@ -47,10 +48,15 @@ public class NotificationConsumer {
 			if (topic.equalsIgnoreCase(configs.getCreateAssessmentTopic()) || topic.equalsIgnoreCase(configs.getUpdateAssessmentTopic())) {
 
 				AssessmentRequest request = mapper.convertValue(record, AssessmentRequest.class);
+				log.info("NotificationConsumer NotificationService listen :: " + request.toString());
+				String strequest = new JSONObject(request).toString();
+				System.out.println("strequest Asseessment :: "+strequest);
 				assessmentNotificationService.process(topic, request);
 			} else if (topic.equalsIgnoreCase(configs.getSavePropertyTopic()) || topic.equalsIgnoreCase(configs.getUpdatePropertyTopic())) {
 
 				PropertyRequest request = mapper.convertValue(record, PropertyRequest.class);
+				String strequest = new JSONObject(request).toString();
+				System.out.println("strequest property :: "+strequest);
 				
 				if (PTConstants.MUTATION_PROCESS_CONSTANT.equalsIgnoreCase(request.getProperty().getCreationReason().toString())) {
 

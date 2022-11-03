@@ -214,6 +214,7 @@ public class NotificationUtil {
             userSearchRequest.put("userName", mobileNo);
             try {
                 Object user = serviceRequestRepository.fetchResult(uri, userSearchRequest).get();
+                System.out.println("user :: **"+user.toString());
                 if(null != user) {
                     String uuid = JsonPath.read(user, "$.user[0].uuid");
                     mapOfPhnoAndUUIDs.put(mobileNo, uuid);
