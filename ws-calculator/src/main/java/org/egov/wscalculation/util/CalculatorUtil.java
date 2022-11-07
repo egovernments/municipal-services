@@ -206,6 +206,30 @@ public class CalculatorUtil {
 			throw new CustomException("PARSING_ERROR", "Error while parsing response of Water Connection Search");
 		}
 	}
+	
+	/**
+	 * 
+	 * @param requestInfo
+	 *            RequestInfo
+	 * @param searchCriteria
+	 *            Search Criteria
+	 * @param tenantId
+	 */
+	
+	public List<WaterConnection> getWaterConnectionOnApplicationNO(RequestInfo requestInfo, SearchCriteria searchCriteria) {
+		Object result = serviceRequestRepository.fetchResult(getWaterSearchURL(searchCriteria),
+				RequestInfoWrapper.builder().requestInfo(requestInfo).build());
+		try {
+			WaterConnectionResponse response;
+			response = mapper.convertValue(result, WaterConnectionResponse.class);
+			if (CollectionUtils.isEmpty(response.getWaterConnection()))
+				return null;
+			return response.getWaterConnection();
+		} catch (IllegalArgumentException e) {
+			throw new CustomException("PARSING_ERROR", "Error while parsing response of Water Connection Search");
+		}
+	}
+	
 
 	/**
 	 * Creates waterConnection search url based on tenantId and connectionNumber
@@ -225,8 +249,14 @@ public class CalculatorUtil {
 			url.append("&");
 			url.append("applicationNumber=").append(searchCriteria.getApplicationNumber());
 		}
+		if (searchCriteria.getIds() != null) {
+			url.append("&");
+			url.append("ids=").append(searchCriteria.getIds());
+		}
 		return url;
 	}
+	
+	
 
 	/**
 	 * Methods provides all the usage category master for Water Service module
