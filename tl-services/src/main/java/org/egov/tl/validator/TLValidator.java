@@ -167,8 +167,8 @@ public class TLValidator {
     private void valideDates(TradeLicenseRequest request ,Object mdmsData){
         request.getLicenses().forEach(license -> {
             Map<String,Long> taxPeriods = null;
-            if(license.getValidTo()==null)
-                throw new CustomException("INVALID VALIDTO DATE"," Validto cannot be null");
+          //  if(license.getValidTo()==null)
+          //      throw new CustomException("INVALID VALIDTO DATE"," Validto cannot be null");
 //            if(license.getApplicationType() != null && license.getApplicationType().toString().equals(TLConstants.APPLICATION_TYPE_RENEWAL)){
 //                taxPeriods = tradeUtil.getTaxPeriods(license,mdmsData);
 //            }else{
