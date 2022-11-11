@@ -23,6 +23,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -167,8 +168,36 @@ public class TLValidator {
     private void valideDates(TradeLicenseRequest request ,Object mdmsData){
         request.getLicenses().forEach(license -> {
             Map<String,Long> taxPeriods = null;
-            if(license.getValidTo()==null)
-                throw new CustomException("INVALID VALIDTO DATE"," Validto cannot be null");
+            if(license.getValidTo()==null) // if valid to in Null then set validTo date upto coming 31-March
+            {
+          //      throw new CustomException("INVALID VALIDTO DATE"," Validto cannot be null");
+            	log.info("validTo is null, setting validTo upto coming next 31-March");
+            	Calendar c=Calendar.getInstance(TimeZone.getTimeZone("IST"));
+            	c.setTimeInMillis(license.getValidFrom());
+            	int y,m,d;
+            	if(c.get(Calendar.MONTH)<4)  // if license being issued validFrom same year (before 31 March) then validTo will be of same year
+            	   y=c.get(Calendar.YEAR);
+            	else
+            	   y=c.get(Calendar.YEAR)+1;  // otherwise validTo is upto next FY
+            	
+            	m=2; //Jan 0
+            	d=31; //
+            	log.info("new validTo d="+d+", m="+(m+1)+" and y="+y); // month started from 0
+            	SimpleDateFormat sf=new SimpleDateFormat("yyyy-MM-dd");
+                Date dt;
+                try
+                {
+                dt=sf.parse(""+y+"-"+m+"-"+d);
+                license.setValidTo(dt.getTime());
+                }
+                catch(Exception ex)
+                {
+                	throw new CustomException("invalid date","unable to prase validTo");
+                }   
+            }
+            
+            
+
 //            if(license.getApplicationType() != null && license.getApplicationType().toString().equals(TLConstants.APPLICATION_TYPE_RENEWAL)){
 //                taxPeriods = tradeUtil.getTaxPeriods(license,mdmsData);
 //            }else{
