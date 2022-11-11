@@ -48,15 +48,10 @@ public class NotificationConsumer {
 			if (topic.equalsIgnoreCase(configs.getCreateAssessmentTopic()) || topic.equalsIgnoreCase(configs.getUpdateAssessmentTopic())) {
 
 				AssessmentRequest request = mapper.convertValue(record, AssessmentRequest.class);
-				log.info("NotificationConsumer NotificationService listen :: " + request.toString());
-				String strequest = new JSONObject(request).toString();
-				System.out.println("strequest Asseessment :: "+strequest);
 				assessmentNotificationService.process(topic, request);
 			} else if (topic.equalsIgnoreCase(configs.getSavePropertyTopic()) || topic.equalsIgnoreCase(configs.getUpdatePropertyTopic())) {
 
 				PropertyRequest request = mapper.convertValue(record, PropertyRequest.class);
-				String strequest = new JSONObject(request).toString();
-				System.out.println("strequest property :: "+strequest);
 				
 				if (PTConstants.MUTATION_PROCESS_CONSTANT.equalsIgnoreCase(request.getProperty().getCreationReason().toString())) {
 
