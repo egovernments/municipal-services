@@ -182,7 +182,7 @@ public class TLValidator {
             	
             	m=2; //Jan 0
             	d=31; //
-            	log.info("new validTo d="+d+", m="+m+" and y="+y);
+            	log.info("new validTo d="+d+", m="+(m+1)+" and y="+y); // month started from 0
             	SimpleDateFormat sf=new SimpleDateFormat("yyyy-MM-dd");
                 Date dt;
                 try
