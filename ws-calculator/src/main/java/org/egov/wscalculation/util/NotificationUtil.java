@@ -3,21 +3,9 @@ package org.egov.wscalculation.util;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
-
-import static com.jayway.jsonpath.Criteria.where;
-import static com.jayway.jsonpath.Filter.filter;
-import static org.egov.wscalculation.constants.WSCalculationConstant.MODULECONSTANT;
-import static org.egov.wscalculation.constants.WSCalculationConstant.ACTION;
-import static org.egov.wscalculation.constants.WSCalculationConstant.CHANNEL_LIST;
-import static org.egov.wscalculation.constants.WSCalculationConstant.CHANNEL;
 
 import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
-import org.egov.mdms.model.MasterDetail;
-import org.egov.mdms.model.MdmsCriteria;
-import org.egov.mdms.model.MdmsCriteriaReq;
-import org.egov.mdms.model.ModuleDetail;
 import org.egov.wscalculation.config.WSCalculationConfiguration;
 import org.egov.wscalculation.constants.WSCalculationConstant;
 import org.egov.wscalculation.web.models.DemandNotificationObj;
@@ -31,9 +19,7 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
-import org.springframework.web.client.RestTemplate;
 
-import com.jayway.jsonpath.Filter;
 import com.jayway.jsonpath.JsonPath;
 
 import lombok.extern.slf4j.Slf4j;
@@ -50,9 +36,6 @@ public class NotificationUtil {
 	
 	@Autowired
 	private WSCalculationProducer producer;
-	
-	@Autowired
-	private RestTemplate restTemplate;
 
 	/**
 	 * Returns the uri for the localization call
@@ -201,48 +184,5 @@ public class NotificationUtil {
 
 		Object response = serviceRequestRepository.getShorteningURL(new StringBuilder(url), obj);
 		return response.toString();
-	}
-	
-	public List<String> fetchChannelList(RequestInfo requestInfo, String tenantId, String moduleName, String action){
-		List<String> masterData = new ArrayList<>();
-		StringBuilder uri = new StringBuilder();
-		uri.append(config.getMdmsHost()).append(config.getMdmsEndPoint());
-		if(StringUtils.isEmpty(tenantId))
-			return masterData;
-		MdmsCriteriaReq mdmsCriteriaReq = getMdmsRequestForChannelList(requestInfo, tenantId.split("\\.")[0]);
-
-		Filter masterDataFilter = filter(
-				where(MODULECONSTANT).is(moduleName).and(ACTION).is(action)
-		);
-
-		try {
-			Object response = restTemplate.postForObject(uri.toString(), mdmsCriteriaReq, Map.class);
-			masterData = JsonPath.parse(response).read("$.MdmsRes.Channel.channelList[?].channelNames[*]", masterDataFilter);
-		}catch(Exception e) {
-			log.error("Exception while fetching workflow states to ignore: ",e);
-		}
-		return masterData;
-	}
-	private MdmsCriteriaReq getMdmsRequestForChannelList(RequestInfo requestInfo, String tenantId){
-		MasterDetail masterDetail = new MasterDetail();
-		masterDetail.setName(CHANNEL_LIST);
-		List<MasterDetail> masterDetailList = new ArrayList<>();
-		masterDetailList.add(masterDetail);
-
-		ModuleDetail moduleDetail = new ModuleDetail();
-		moduleDetail.setMasterDetails(masterDetailList);
-		moduleDetail.setModuleName(CHANNEL);
-		List<ModuleDetail> moduleDetailList = new ArrayList<>();
-		moduleDetailList.add(moduleDetail);
-
-		MdmsCriteria mdmsCriteria = new MdmsCriteria();
-		mdmsCriteria.setTenantId(tenantId);
-		mdmsCriteria.setModuleDetails(moduleDetailList);
-
-		MdmsCriteriaReq mdmsCriteriaReq = new MdmsCriteriaReq();
-		mdmsCriteriaReq.setMdmsCriteria(mdmsCriteria);
-		mdmsCriteriaReq.setRequestInfo(requestInfo);
-
-		return mdmsCriteriaReq;
 	}
 }
