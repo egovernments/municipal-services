@@ -185,24 +185,4 @@ public class NotificationUtil {
 		Object response = serviceRequestRepository.getShorteningURL(new StringBuilder(url), obj);
 		return response.toString();
 	}
-	public List<String> fetchChannelList(RequestInfo requestInfo, String tenantId, String moduleName, String action){
-		List<String> masterData = new ArrayList<>();
-		StringBuilder uri = new StringBuilder();
-		uri.append(config.getMdmsHost()).append(config.getMdmsEndPoint());
-		if(StringUtils.isEmpty(tenantId))
-			return masterData;
-		MdmsCriteriaReq mdmsCriteriaReq = getMdmsRequestForChannelList(requestInfo, tenantId.split("\\.")[0]);
-
-		Filter masterDataFilter = filter(
-				where(MODULECONSTANT).is(moduleName).and(ACTION).is(action)
-		);
-
-		try {
-			Object response = restTemplate.postForObject(uri.toString(), mdmsCriteriaReq, Map.class);
-			masterData = JsonPath.parse(response).read("$.MdmsRes.Channel.channelList[?].channelNames[*]", masterDataFilter);
-		}catch(Exception e) {
-			log.error("Exception while fetching workflow states to ignore: ",e);
-		}
-		return masterData;
-	}
 }
