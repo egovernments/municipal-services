@@ -9,7 +9,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.wscalculation.config.WSCalculationConfiguration;
 import org.egov.wscalculation.constants.WSCalculationConstant;
-import org.egov.mdms.model.MdmsCriteriaReq;
 import org.egov.wscalculation.web.models.DemandNotificationObj;
 import org.egov.wscalculation.web.models.EmailRequest;
 import org.egov.wscalculation.web.models.EventRequest;
