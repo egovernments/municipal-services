@@ -33,7 +33,7 @@ public class DemandNotificationConsumer {
 	public void listen(final HashMap<String, Object> request, @Header(KafkaHeaders.RECEIVED_TOPIC) String topic) {
 		DemandNotificationObj notificationObj;
 		String jsonString = new JSONObject(request).toString();
-        	System.out.println(jsonString);
+        	System.out.println("listen :: request "+jsonString);
 		try {
 			notificationObj = mapper.convertValue(request, DemandNotificationObj.class);
 			notificationService.process(notificationObj, topic);
