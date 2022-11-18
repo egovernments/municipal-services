@@ -11,7 +11,7 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.stereotype.Service;
-
+import org.json.JSONObject;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
@@ -29,9 +29,11 @@ public class DemandNotificationConsumer {
 	 * @param request Topic Message
 	 * @param topic - Topic Name
 	 */
-	@KafkaListener(topics = { "${ws.calculator.demand.successful.topic}", "${ws.calculator.demand.failed}" })
+	@KafkaListener(topics = { "${ws.calculator.demand.successful.topic}", "${ws.calculator.demand.failed}","${egov.watercalculatorservice.createdemand.topic}"} })
 	public void listen(final HashMap<String, Object> request, @Header(KafkaHeaders.RECEIVED_TOPIC) String topic) {
 		DemandNotificationObj notificationObj;
+		String jsonString = new JSONObject(request).toString();
+        	System.out.println(jsonString);
 		try {
 			notificationObj = mapper.convertValue(request, DemandNotificationObj.class);
 			notificationService.process(notificationObj, topic);
