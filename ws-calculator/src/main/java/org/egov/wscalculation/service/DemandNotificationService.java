@@ -61,6 +61,7 @@ public class DemandNotificationService {
 	public void process(DemandNotificationObj notificationObj, String topic) {
 		if (config.getIsSMSEnabled() != null && config.getIsSMSEnabled()) {
 			List<SMSRequest> smsRequests = new LinkedList<>();
+			System.out.println("process ::1 topic "+topic +" smsRequests"+smsRequests);
 			enrichSMSRequest(notificationObj, smsRequests, topic);
 			if (!CollectionUtils.isEmpty(smsRequests))
 				util.sendSMS(smsRequests);
@@ -76,6 +77,7 @@ public class DemandNotificationService {
 		String tenantId = notificationObj.getTenantId();
 		String localizationMessage = util.getLocalizationMessages(tenantId, notificationObj.getRequestInfo());
 		String messageTemplate = util.getCustomizedMsgForSMS(topic, localizationMessage);
+		System.out.println("enrichSMSRequest ::2 "+notificationObj);
 		if (messageTemplate == null) {
 			log.info("No message Found For Topic : " + topic);
 		}
