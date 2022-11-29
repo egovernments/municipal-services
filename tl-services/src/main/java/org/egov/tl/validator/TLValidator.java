@@ -175,7 +175,7 @@ public class TLValidator {
             	Calendar c=Calendar.getInstance(TimeZone.getTimeZone("IST"));
             	c.setTimeInMillis(license.getValidFrom());
             	int y,m,d;
-            	if(c.get(Calendar.MONTH)<4)  // if license being issued validFrom same year (before 31 March) then validTo will be of same year
+            	if(c.get(Calendar.MONTH)+1 < 4)  // if license being issued validFrom same year (before 31 March) then validTo will be of same year
             	   y=c.get(Calendar.YEAR);
             	else
             	   y=c.get(Calendar.YEAR)+1;  // otherwise validTo is upto next FY
@@ -187,7 +187,7 @@ public class TLValidator {
                 Date dt;
                 try
                 {
-                dt=sf.parse(""+y+"-"+m+"-"+d);
+                dt=sf.parse(""+y+"-"+(m+1)+"-"+d);
                 license.setValidTo(dt.getTime());
                 }
                 catch(Exception ex)
