@@ -381,7 +381,8 @@ public class TradeLicenseService {
             String businessServiceName = null;
             switch (businessServicefromPath) {
                 case businessService_TL:
-                    businessServiceName = config.getTlBusinessServiceValue();
+                    //businessServiceName = config.getTlBusinessServiceValue();
+                	businessServiceName = licence.getWorkflowCode();
                     break;
 
                 case businessService_BPA:

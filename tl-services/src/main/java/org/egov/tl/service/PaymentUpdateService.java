@@ -102,7 +102,8 @@ public class PaymentUpdateService {
 					String wfbusinessServiceName = null;
 					switch (paymentDetail.getBusinessService()) {
 						case businessService_TL:
-							wfbusinessServiceName = config.getTlBusinessServiceValue();
+							wfbusinessServiceName = ((TradeLicense)licenses.get(0)).getWorkflowCode();
+							//wfbusinessServiceName = config.getTlBusinessServiceValue();
 							break;
 
 						case businessService_BPA:
