@@ -96,6 +96,11 @@ public class EstimationService {
 				(JSONArray) masterData.get(WSCalculationConstant.CALCULATION_ATTRIBUTE_CONST));
 		timeBasedExemptionMasterMap.put(WSCalculationConstant.WC_WATER_CESS_MASTER,
 				(JSONArray) (masterData.getOrDefault(WSCalculationConstant.WC_WATER_CESS_MASTER, null)));
+		
+		 for (Map.Entry<String,JSONArray> entry : billingSlabMaster.entrySet()) {
+	            log.info("Key = " + entry.getKey() + ", Value = " + entry.getValue());
+	     }
+		
 		// mDataService.setWaterConnectionMasterValues(requestInfo, tenantId,
 		// billingSlabMaster,
 		// timeBasedExemptionMasterMap);
