@@ -29,7 +29,7 @@ public class DemandNotificationConsumer {
 	 * @param request Topic Message
 	 * @param topic - Topic Name
 	 */
-	@KafkaListener(topics = { "${ws.calculator.demand.successful.topic}", "${ws.calculator.demand.failed}" })
+	@KafkaListener(topics = { "${ws.calculator.demand.successful.topic}", "${ws.calculator.demand.failed}","${egov.watercalculatorservice.createdemand.topic}" })
 	public void listen(final HashMap<String, Object> request, @Header(KafkaHeaders.RECEIVED_TOPIC) String topic) {
 		DemandNotificationObj notificationObj;
 		String jsonString = new JSONObject(request).toString();
