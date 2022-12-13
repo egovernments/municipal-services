@@ -114,6 +114,10 @@ public class EstimationService {
 		estimatesAndBillingSlabs.put("estimates", taxHeadEstimates);
 		// Billing slab id
 		estimatesAndBillingSlabs.put("billingSlabIds", billingSlabIds);
+		
+		for(Map.Entry<String, List> ent : estimatesAndBillingSlabs.entrySet()) {
+			  log.info(" estimatesAndBillingSlabs Key = " + ent.getKey() + ", Value = " + ent.getValue());
+		}
 		return estimatesAndBillingSlabs;
 	}
 
