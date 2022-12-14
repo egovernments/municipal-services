@@ -312,20 +312,20 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 //		List<String> tenantIds = wSCalculationDao.getTenantId();
 		List<String> tenantIds = new ArrayList<>();
 		tenantIds.add("pb.fazilka");
-//		tenantIds.add("pb.amritsar");
-//		tenantIds.add("pb.itpatiala");
-//		tenantIds.add("pb.testing");
-//		tenantIds.add("pb.bassipathana");
-//		tenantIds.add("pb.amargarh");
-//		tenantIds.add("pb.nadala");
-//		tenantIds.add("pb.bhadson");
-//		tenantIds.add("pb.shahkot");
-//		tenantIds.add("pb.mamdot");
-//		tenantIds.add("pb.ahmedgarh");
-//		tenantIds.add("pb.bhawanigarh");
-//		tenantIds.add("pb.balachaur");
-//		tenantIds.add("pb.talwara");
-//		
+		tenantIds.add("pb.amritsar");
+		tenantIds.add("pb.itpatiala");
+		tenantIds.add("pb.testing");
+		tenantIds.add("pb.bassipathana");
+		tenantIds.add("pb.amargarh");
+		tenantIds.add("pb.nadala");
+		tenantIds.add("pb.bhadson");
+		tenantIds.add("pb.shahkot");
+		tenantIds.add("pb.mamdot");
+		tenantIds.add("pb.ahmedgarh");
+		tenantIds.add("pb.bhawanigarh");
+		tenantIds.add("pb.balachaur");
+		tenantIds.add("pb.talwara");
+		
 
 		
 
