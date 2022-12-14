@@ -28,6 +28,8 @@ import org.egov.wscalculation.web.models.WaterConnection;
 import org.egov.wscalculation.web.models.WaterConnectionResponse;
 import org.egov.wscalculation.web.models.workflow.ProcessInstance;
 import org.egov.wscalculation.web.models.workflow.ProcessInstanceResponse;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -316,8 +318,12 @@ public class CalculatorUtil {
 	 * @return Master For Billing Period
 	 */
 	public Map<String, Object> loadBillingFrequencyMasterData(RequestInfo requestInfo, String tenantId) {
+		log.info("loadBillingFrequencyMasterData");
 		MdmsCriteriaReq mdmsCriteriaReq = getBillingFrequencyForScheduler(requestInfo, tenantId);
 		Object res = serviceRequestRepository.fetchResult(getMdmsSearchUrl(), mdmsCriteriaReq);
+		log.info("loadBillingFrequencyMasterData::"+res);
+		String jsonString = new JSONObject(res).toString();
+		log.info("loadBillingFrequencyMasterData"+jsonString);
 		if (res == null) {
 			throw new CustomException("MDMS_ERROR_FOR_BILLING_FREQUENCY", "ERROR IN FETCHING THE BILLING FREQUENCY");
 		}
@@ -438,6 +444,7 @@ public class CalculatorUtil {
 	 */
 	public MdmsCriteriaReq prepareWSTaxPeriodMdmsRequest(RequestInfo requestInfo, String serviceName, String tenantId) {
 		
+		log.info("prepareWSTaxPeriodMdmsRequest:: start");
 			MasterDetail masterDetail = MasterDetail.builder().name(WSCalculationConstant.TAXPERIOD_MASTERNAME)
 					.filter("[?(@.periodCycle=='QUATERLY' && @.service== '"+serviceName+"')]")
 					.build();
@@ -445,6 +452,7 @@ public class CalculatorUtil {
 					.masterDetails(Arrays.asList(masterDetail)).build();
 			MdmsCriteria mdmsCriteria = MdmsCriteria.builder().moduleDetails(Arrays.asList(moduleDetail)).tenantId(tenantId)
 					.build();
+			log.info("prepareWSTaxPeriodMdmsRequest:: end"+mdmsCriteria);
 			return MdmsCriteriaReq.builder().requestInfo(requestInfo).mdmsCriteria(mdmsCriteria).build();
 
 	}
@@ -470,6 +478,7 @@ public class CalculatorUtil {
 			taxPeriods = taxPeriods.stream()
 					     .sorted(Comparator.comparing(TaxPeriod::getFromDate))
 					     .collect(Collectors.toList());
+		
 			return taxPeriods;
 			
 		} catch (Exception e) {

@@ -21,6 +21,7 @@ public class ServiceRequestRepository {
 	private RestTemplate restTemplate;
 
 	public Object fetchResult(StringBuilder uri, Object request) {
+		log.info("fetchResult :: "+uri);
 		mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
 		Object response = null;
 		log.debug("URI: " + uri);
