@@ -29,8 +29,9 @@ import org.springframework.web.bind.annotation.RestController;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
-
+@Slf4j
 @Getter
 @Setter
 @Builder
@@ -84,11 +85,13 @@ public class CalculatorController {
 	
 	@PostMapping("/_jobscheduler")
 	public void jobscheduler(@Valid @RequestBody RequestInfoWrapper requestInfoWrapper) {
+		log.info("_jobscheduler::");
 		wSCalculationService.generateDemandBasedOnTimePeriod(requestInfoWrapper.getRequestInfo());
 	}
 	
 	@PostMapping("/_jobbillscheduler")
 	public void jobbillscheduler(@Valid @RequestBody RequestInfoWrapper requestInfoWrapper) {
+		log.info("_jobbillscheduler::");
 		wSCalculationService.generateBillBasedLocality(requestInfoWrapper.getRequestInfo());
 	}
 	
