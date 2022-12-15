@@ -348,9 +348,18 @@ public class EstimationService {
 		if (calculationAttributeMap == null)
 			throw new CustomException("CALCULATION_ATTRIBUTE_MASTER_NOT_FOUND",
 					"Calculation attribute master not found!!");
-		JSONArray filteredMasters = JsonPath.read(calculationAttributeMap,
-				"$.CalculationAttribute[?(@.name=='" + connectionType + "')]");
+		
+		log.info("connectionType"+connectionType +" calculationAttributeMap "+calculationAttributeMap.toString());
+		JSONArray filteredMasters = null;
+		try {
+			 filteredMasters = JsonPath.read(calculationAttributeMap,
+					"$.CalculationAttribute[?(@.name=='" + connectionType + "')]");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		JSONObject master = mapper.convertValue(filteredMasters.get(0), JSONObject.class);
+		String obj = new JSONObject(master).toString();
+		log.info("obj:: "+obj);
 		return master.getAsString(WSCalculationConstant.ATTRIBUTE);
 	}
 
