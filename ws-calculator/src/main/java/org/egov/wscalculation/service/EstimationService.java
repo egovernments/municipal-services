@@ -556,7 +556,7 @@ public class EstimationService {
 			   fromPlotSize=new BigDecimal(connFeeMap.get("fromPlotSize"));
 			   toPlotSize=new BigDecimal(connFeeMap.get("toPlotSize"));
 			   //connectionFeeApplicable=new BigDecimal(connFeeMap.get("connectionFee"));
-			   propertyType=connFeeMap.get("propertyType").toString();
+			   propertyType=connFeeMap.get("usageType").toString();
 			   if(propertyType.equals(connection_propertyType) &&  connection_plotSize.compareTo(fromPlotSize)>0 && connection_plotSize.compareTo(toPlotSize)<=0)
 			   {
 				   connectionFeeApplicable=new BigDecimal(connFeeMap.get("connectionFee"));
