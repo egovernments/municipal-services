@@ -422,6 +422,9 @@ public class MasterDataService {
 						calculatorUtils.getEstimationMasterCriteria(requestInfo, tenantId)),
 				MdmsResponse.class);
 		Map<String, JSONArray> res = response.getMdmsRes().get(WSCalculationConstant.WS_TAX_MODULE);
+		
+		//here it has fetched connection fee along with other tax heads
+		
 		for (Map.Entry<String, JSONArray> resp : res.entrySet()) {
 			master.put(resp.getKey(), resp.getValue());
 		}

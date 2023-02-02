@@ -522,11 +522,51 @@ public class EstimationService {
 			securityCharge = new BigDecimal(
 					feeObj.getAsNumber(WSCalculationConstant.WS_SECURITY_CHARGE_CONST).toString());
 		}
+		
+		//Connection Fee to be evaluated here  from mdms depending on plotsize
 
 		BigDecimal connectionFee = BigDecimal.ZERO;
 		if (feeObj.get(WSCalculationConstant.WS_CONNECTION_FEE_CONST) != null) {
-			connectionFee = new BigDecimal(
-					feeObj.getAsNumber(WSCalculationConstant.WS_CONNECTION_FEE_CONST).toString());
+			
+			BigDecimal connection_plotSize;
+			if(property.getLandArea()==null || property.getLandArea().equals("")) // in case of shared proprties landArea may not be present
+				connection_plotSize=null;
+			else
+				connection_plotSize=new BigDecimal(property.getLandArea());
+			
+			String connection_propertyType=((HashMap<String,String>)criteria.getWaterConnection().getAdditionalDetails()).get("waterSubUsageType");
+			if(connection_plotSize==null || connection_propertyType==null || connection_propertyType.equals(""))
+				connection_propertyType="DEFAULT"; // default connectionFee to be applied from mdms
+			else if(connection_propertyType.contains("DOM") || connection_propertyType.contains("USAGE_RESIDENTIAL") )
+				connection_propertyType="DOMESTIC";
+			else 
+				connection_propertyType="COMMERCIAL";
+			
+			ArrayList conn_fees=(ArrayList)feeObj.get(WSCalculationConstant.WS_CONNECTION_FEE_CONST);
+			
+			BigDecimal fromPlotSize=BigDecimal.ZERO;
+			BigDecimal toPlotSize=BigDecimal.ZERO;
+			BigDecimal connectionFeeApplicable=BigDecimal.ZERO;
+			String propertyType=null;
+			
+			HashMap<String,String> connFeeMap=null;
+			for (int i=0;i<conn_fees.size();i++)
+			{
+			   connFeeMap=(HashMap<String,String>)conn_fees.get(i);
+			   fromPlotSize=new BigDecimal(connFeeMap.get("fromPlotSize"));
+			   toPlotSize=new BigDecimal(connFeeMap.get("toPlotSize"));
+			   //connectionFeeApplicable=new BigDecimal(connFeeMap.get("connectionFee"));
+			   propertyType=connFeeMap.get("usageType").toString();
+			   if(propertyType.equals(connection_propertyType) &&  connection_plotSize.compareTo(fromPlotSize)>0 && connection_plotSize.compareTo(toPlotSize)<=0)
+			   {
+				   connectionFeeApplicable=new BigDecimal(connFeeMap.get("connectionFee"));
+				   break; // matched the attributes and got valid connection fee
+			   }
+			   
+			}
+			
+			//connectionFee = new BigDecimal(feeObj.getAsNumber(WSCalculationConstant.WS_CONNECTION_FEE_CONST).toString());
+			connectionFee=connectionFeeApplicable;
 		}
 
 		BigDecimal otherCharges = BigDecimal.ZERO;
