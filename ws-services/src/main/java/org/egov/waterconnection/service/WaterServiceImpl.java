@@ -131,6 +131,8 @@ public class WaterServiceImpl implements WaterService {
 	public List<WaterConnection> search(SearchCriteria criteria, RequestInfo requestInfo) {
 		List<WaterConnection> waterConnectionList;
 		waterConnectionList = getWaterConnectionsList(criteria, requestInfo);
+		log.info("Water Connection List Inside Search API call ::" + waterConnectionList);
+		log.info("Search Criteria ::" + criteria);
 		if (!StringUtils.isEmpty(criteria.getSearchType())
 				&& criteria.getSearchType().equals(WCConstants.SEARCH_TYPE_CONNECTION)) {
 			waterConnectionList = enrichmentService.filterConnections(waterConnectionList);
