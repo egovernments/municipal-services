@@ -115,7 +115,8 @@ public class WaterServiceImpl implements WaterService {
 		{
 			log.info("Inside Workflow initiation Loop!!!!!");
 			wfIntegrator.callWorkFlow(waterConnectionRequest, property);
-		}		
+		}
+		log.info("Water Connection Request ::"+ waterConnectionRequest);
 		waterDao.saveWaterConnection(waterConnectionRequest);
 		return Arrays.asList(waterConnectionRequest.getWaterConnection());
 	}
