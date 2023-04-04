@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import lombok.extern.slf4j.Slf4j;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.wscalculation.repository.WSCalculationDao;
 import org.egov.wscalculation.validator.WSCalculationValidator;
@@ -17,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
+@Slf4j
 public class MeterServicesImpl implements MeterService {
 
 	@Autowired
@@ -57,7 +59,9 @@ public class MeterServicesImpl implements MeterService {
 		}
 		enrichmentService.enrichMeterReadingRequest(meterConnectionRequest);
 		meterReadingsList.add(meterConnectionRequest.getMeterReading());
+		log.info("Before saving meter connection request:::: " + meterConnectionRequest);
 		wSCalculationDao.saveMeterReading(meterConnectionRequest);
+		log.info("Meter Reading List   " + meterReadingsList);
 		if (meterConnectionRequest.getMeterReading().getGenerateDemand()) {
 			generateDemandForMeterReading(meterReadingsList, meterConnectionRequest.getRequestInfo());
 		}
@@ -80,6 +84,7 @@ public class MeterServicesImpl implements MeterService {
 		});
 		CalculationReq calculationRequest = CalculationReq.builder().requestInfo(requestInfo)
 				.calculationCriteria(criteriaList).isconnectionCalculation(true).build();
+		log.info("Calculation Request For Demand Generation:: " + calculationRequest);
 		wSCalculationService.getCalculation(calculationRequest);
 	}
 	

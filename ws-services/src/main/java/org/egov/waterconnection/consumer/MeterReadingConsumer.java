@@ -40,6 +40,7 @@ public class MeterReadingConsumer {
 			if (!StringUtils.isEmpty(waterConnectionRequest.getWaterConnection().getConnectionType())
 					&& WCConstants.METERED_CONNECTION
 							.equalsIgnoreCase(waterConnectionRequest.getWaterConnection().getConnectionType())) {
+				log.info("Water Connection Request Inside Consumer :::" + waterConnectionRequest);
 				meterReadingService.process(waterConnectionRequest, topic);
 			}
 		} catch (Exception ex) {

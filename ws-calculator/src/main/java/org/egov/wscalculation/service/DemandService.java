@@ -134,6 +134,8 @@ public class DemandService {
 		// List that will contain Calculation for old demands
 		List<Calculation> updateCalculations = new LinkedList<>();
 		List<Demand> demands = null;
+
+		log.info("Calculations List:::"+ calculations);
 		
 		if (!CollectionUtils.isEmpty(calculations)) {
 			// Collect required parameters for demand search
@@ -157,6 +159,8 @@ public class DemandService {
 			if (!CollectionUtils.isEmpty(demands))
 				connectionNumbersFromDemands = demands.stream().map(Demand::getConsumerCode)
 						.collect(Collectors.toSet());
+
+			log.info("connectionNumbersFromDemands :::::"+ connectionNumbersFromDemands);
 
 			// If demand already exists add it updateCalculations else
 			// createCalculations
@@ -529,6 +533,7 @@ public class DemandService {
 		Object result = serviceRequestRepository.fetchResult(
 				getDemandSearchURL(tenantId, consumerCodes, taxPeriodFrom, taxPeriodTo),
 				RequestInfoWrapper.builder().requestInfo(requestInfo).build());
+		log.info("Search Demand result::::" + result);
 		try {
 			return mapper.convertValue(result, DemandResponse.class).getDemands();
 		} catch (IllegalArgumentException e) {

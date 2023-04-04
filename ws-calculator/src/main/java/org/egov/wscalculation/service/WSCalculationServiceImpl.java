@@ -97,13 +97,16 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 			//Calculate and create demand for connection
 			masterMap = masterDataService.loadMasterData(request.getRequestInfo(),
 					request.getCalculationCriteria().get(0).getTenantId());
+			log.info("<Meter Map> for getting calculations:::" + masterMap);
 			calculations = getCalculations(request, masterMap);
 		} else {
 			//Calculate and create demand for application
 			masterMap = masterDataService.loadExemptionMaster(request.getRequestInfo(),
 					request.getCalculationCriteria().get(0).getTenantId());
+			log.info("<Meter Map> for getting fee calculations:::" + masterMap);
 			calculations = getFeeCalculation(request, masterMap);
 		}
+		log.info("Calculations:::" + calculations);
 		demandService.generateDemand(request, calculations, masterMap, request.getIsconnectionCalculation());
 		unsetWaterConnection(calculations);
 		return calculations;

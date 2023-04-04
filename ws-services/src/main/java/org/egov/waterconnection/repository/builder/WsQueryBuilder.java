@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import lombok.extern.slf4j.Slf4j;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.waterconnection.config.WSConfiguration;
 import org.egov.waterconnection.service.UserService;
@@ -18,6 +19,7 @@ import org.springframework.util.StringUtils;
 import static org.egov.waterconnection.constants.WCConstants.SEARCH_TYPE_CONNECTION;
 
 @Component
+@Slf4j
 public class WsQueryBuilder {
 
 	@Autowired
@@ -76,9 +78,12 @@ public class WsQueryBuilder {
 	 */
 	public String getSearchQueryString(SearchCriteria criteria, List<Object> preparedStatement,
 			RequestInfo requestInfo) {
+		log.info("Search Criteria Passed :::"+ criteria);
+
 		if (criteria.isEmpty())
 				return null;
 		StringBuilder query = new StringBuilder(WATER_SEARCH_QUERY);
+		log.info("Search Query Loaded :::"+ query);
 		boolean propertyIdsPresent = false;
 		
 		String propertyIdQuery = " (conn.property_id in (";
@@ -181,6 +186,8 @@ public class WsQueryBuilder {
 			preparedStatement.add(criteria.getLocality());
 		}
 		query.append(ORDER_BY_CLAUSE);
+
+		log.info("Search Query Created After All the Checks :::"+ query);
 		return addPaginationWrapper(query.toString(), preparedStatement, criteria);
 	}
 	

@@ -180,6 +180,7 @@ public class CalculatorUtil {
 		url.append("&");
 		url.append("connectionNumber=");
 		url.append(connectionNo);
+		log.info("Search Water Connection Url:::"+ url);
 		return url;
 	}
 
