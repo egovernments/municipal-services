@@ -135,7 +135,7 @@ public class DemandService {
 		List<Calculation> updateCalculations = new LinkedList<>();
 		List<Demand> demands = null;
 
-		log.info("Calculations List:::"+ calculations);
+		log.info("Calculations List:::"+ calculations.toString());
 		
 		if (!CollectionUtils.isEmpty(calculations)) {
 			// Collect required parameters for demand search

@@ -222,12 +222,23 @@ public class EstimationService {
 
 			log.info("Before billingslab  filter: " + billSlab.toString());
 
+			// In current mdms configuration of WcBillingSlab for metered connection
+			//there is no configuration done for effectiveFrom and effectiveTO dates
+			//so in future if that configuration is done then this filter logic will work
+
+//			List<Slab> filteredSlabs = billSlab.getSlabs().stream()
+//					.filter(slab -> slab.getFrom() <= totalUOM && slab.getTo() >= totalUOM
+//							&& slab.getEffectiveFrom() <= System.currentTimeMillis()
+//							&& slab.getEffectiveTo() >= System.currentTimeMillis())
+//					.collect(Collectors.toList());
+
 			List<Slab> filteredSlabs = billSlab.getSlabs().stream()
-					.filter(slab -> slab.getFrom() <= totalUOM && slab.getTo() >= totalUOM
-							&& slab.getEffectiveFrom() <= System.currentTimeMillis()
-							&& slab.getEffectiveTo() >= System.currentTimeMillis())
+					.filter(slab -> slab.getFrom() <= totalUOM && slab.getTo() >= totalUOM)
 					.collect(Collectors.toList());
-			log.info("After billingslab  filter: " + filteredSlabs.size());
+
+			log.info("After billingslab  filter size: " + filteredSlabs.size());
+
+			log.info("After billingslab  filter: " + filteredSlabs.toString());
 			// IF calculation type is flat then take flat rate else take slab and calculate
 			// the charge
 			// For metered connection calculation on graded fee slab
