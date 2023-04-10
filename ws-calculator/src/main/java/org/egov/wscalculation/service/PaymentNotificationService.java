@@ -209,7 +209,9 @@ public class PaymentNotificationService {
 	private List<SMSRequest> getSmsRequest(HashMap<String, String> mappedRecord, WaterConnectionRequest waterConnectionRequest, String topic,
 			Property property) {
 		String localizationMessage = notificationUtil.getLocalizationMessages(mappedRecord.get(tenantId), waterConnectionRequest.getRequestInfo());
+		log.info("Inside PaymentNotificationService getSmsRequest method  fetching localizationMessage:: "+ localizationMessage );
 		String message = notificationUtil.getCustomizedMsgForSMS(topic, localizationMessage);
+		log.info("Inside PaymentNotificationService getSmsRequest method  fetching message:: "+ message );
 		if (message == null) {
 			log.info("No message Found For Topic : " + topic);
 			return Collections.emptyList();
@@ -231,14 +233,17 @@ public class PaymentNotificationService {
 				message);
 		List<SMSRequest> smsRequest = new ArrayList<>();
 		mobileNumberAndMessage.forEach((mobileNumber, msg) -> {
+			log.info("Message Template before replacing any data::"+ msg);
 			if (msg.contains("<Link to Bill>")) {
 				String actionLink = config.getSmsNotificationLink()
 						.replace("$consumerCode", waterConnectionRequest.getWaterConnection().getConnectionNo())
 						.replace("$tenantId", property.getTenantId());
+				log.info("Action Link Created::" + actionLink );
 				actionLink = config.getNotificationUrl() + actionLink;
 				actionLink = notificationUtil.getShortnerURL(actionLink);
 				msg = msg.replace("<Link to Bill>", actionLink);
 			}
+			log.info("Message Created After the conditional check::"+ msg);
 			SMSRequest req = SMSRequest.builder().mobileNumber(mobileNumber).message(msg).category(Category.TRANSACTION).build();
 			smsRequest.add(req);
 		});
