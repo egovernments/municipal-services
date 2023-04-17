@@ -98,9 +98,9 @@ public class WaterFieldValidator implements WaterActionValidator {
 				errorMap.put("INVALID_DATE_EFFECTIVE_FROM", "Date effective from cannot be null or negative");
 			}
 			if (waterConnectionRequest.getWaterConnection().getDateEffectiveFrom() != null) {
-				if (System.currentTimeMillis() > waterConnectionRequest.getWaterConnection().getDateEffectiveFrom()) {
-					errorMap.put("DATE_EFFECTIVE_FROM_IN_PAST", "Date effective from cannot be past");
-				}
+				//if (System.currentTimeMillis() > waterConnectionRequest.getWaterConnection().getDateEffectiveFrom()) {
+				//	errorMap.put("DATE_EFFECTIVE_FROM_IN_PAST", "Date effective from cannot be past");
+				//}
 				if ((waterConnectionRequest.getWaterConnection().getConnectionExecutionDate() != null)
 						&& (waterConnectionRequest.getWaterConnection()
 						.getConnectionExecutionDate() > waterConnectionRequest.getWaterConnection()
