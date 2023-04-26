@@ -323,6 +323,9 @@ public class WorkflowNotificationService {
 			if (messageToReplace.contains("{Application number}"))
 				messageToReplace = messageToReplace.replace("{Application number}", waterConnectionRequest.getWaterConnection().getApplicationNo());
 
+			if (messageToReplace.contains("{Connection number}"))
+				messageToReplace = messageToReplace.replace("{Connection number}", waterConnectionRequest.getWaterConnection().getConnectionNo());
+			
 			if (messageToReplace.contains("{Application download link}"))
 				messageToReplace = messageToReplace.replace("{Application download link}",
 						waterServiceUtil.getShortnerURL(getApplicationDownloadLink(waterConnectionRequest, property)));
