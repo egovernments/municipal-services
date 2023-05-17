@@ -319,6 +319,37 @@ public class EnrichmentService {
 		UserDetailResponse userDetailResponse = userService.getUser(userSearchRequest);
 		enrichConnectionHolderInfo(userDetailResponse, waterConnectionList,requestInfo);
 	}
+	
+	
+	/**
+	 * Enrich
+	 * 
+	 * @param waterConnectionList - List Of WaterConnectionObject
+	 * @param criteria - Search Criteria
+	 * @param requestInfo - RequestInfo Object
+	 */
+	public void enrichAdditionalDeatils(List<WaterConnection> waterConnectionList, SearchCriteria criteria,
+			RequestInfo requestInfo) {
+		if (CollectionUtils.isEmpty(waterConnectionList))
+			return;
+		HashMap additionalDetails = new HashMap<>();
+		for (WaterConnection waterConnection : waterConnectionList) {
+			{
+				additionalDetails =  mapper.convertValue(waterConnection.getAdditionalDetails(), HashMap.class);
+				if(additionalDetails.containsKey("biilingAmount") && (additionalDetails.get("billingAmount")==null || additionalDetails.get("billingAmount").toString().trim().contentEquals("") ))
+				{
+					additionalDetails.replace("billingAmount", new Integer(0));
+				    waterConnection.setAdditionalDetails(additionalDetails);
+				}
+			}
+			
+			
+			
+		}
+	}
+		
+
+	
 
 	/**
 	 *Populates the owner fields inside of the water connection objects from the response got from calling user api
