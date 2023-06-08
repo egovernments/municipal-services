@@ -620,7 +620,7 @@ public class EstimationService {
 		if (plotSlab != null) {
 			masterSlab.put("PlotSizeSlab", plotSlab);
 			JSONArray filteredMasters = JsonPath.read(masterSlab,
-					"$.PlotSizeSlab[?(@.from <=" + plotSize + "&& @.to > " + plotSize + ")]");
+					"$.PlotSizeSlab[?(@.from <" + plotSize + "&& @.to >= " + plotSize + ")]");
 			if (CollectionUtils.isEmpty(filteredMasters))
 				return charge;
 			JSONObject master = mapper.convertValue(filteredMasters.get(0), JSONObject.class);
