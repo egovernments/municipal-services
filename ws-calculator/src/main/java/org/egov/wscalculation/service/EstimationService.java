@@ -223,7 +223,7 @@ public class EstimationService {
 			log.info("Before billingslab  filter: " + billSlab.toString());
 
 			List<Slab> filteredSlabs = billSlab.getSlabs().stream()
-					.filter(slab -> slab.getFrom() <= totalUOM && slab.getTo() >= totalUOM
+					.filter(slab -> slab.getFrom() < totalUOM && slab.getTo() >= totalUOM
 							&& slab.getEffectiveFrom() <= System.currentTimeMillis()
 							&& slab.getEffectiveTo() >= System.currentTimeMillis())
 					.collect(Collectors.toList());
