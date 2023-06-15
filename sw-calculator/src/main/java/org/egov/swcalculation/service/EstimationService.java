@@ -196,7 +196,7 @@ public class EstimationService {
 				boolean slabCondition = false;
 
 				if (waterSubUsageType != null) {
-					slabCondition = totalUnits >= slab.getFrom() && totalUnits < slab.getTo()
+					slabCondition = totalUnits > slab.getFrom() && totalUnits <= slab.getTo()
 							&& slab.getEffectiveFrom() <= System.currentTimeMillis()
 							&& slab.getEffectiveTo() >= System.currentTimeMillis()
 							&& waterSubUsageType.equalsIgnoreCase(billSlab.getWaterSubUsageType());
