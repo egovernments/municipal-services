@@ -6,7 +6,7 @@ const envVariables = {
     "46ad4cd2bd2d8d2f3a6cb567482b6c703473dc0eaf150baea5a92909131302b5",
   DB_HOST: process.env.DB_HOST || "ec2-54-225-68-133.compute-1.amazonaws.com",
   DB_NAME: process.env.DB_NAME || "d9jf2v9doprlot",
-  DB_SSL: process.env.DB_SSL || true,
+  DB_SSL: process.env.DB_SSL || false,
   DB_PORT: process.env.DB_PORT || 5432,
   DB_MAX_POOL_SIZE: process.env.DB_MAX_POOL_SIZE || "5",
 
@@ -33,7 +33,7 @@ const envVariables = {
     process.env.TRACER_ENABLE_REQUEST_LOGGING || false,
 
   //default host configurations
-  HOST_URL: process.env.HOST_URL || "https://egov-micro-dev.egovernments.org",
+  HOST_URL: process.env.HOST_URL || "https://mseva-uat.lgpunjab.gov.in",
 
   //logger configurations
   HTTP_CLIENT_DETAILED_LOGGING_ENABLED:
@@ -41,7 +41,7 @@ const envVariables = {
 
   //workflow service configurations
   EGOV_WORKFLOW_HOST: process.env.EGOV_WORKFLOW_HOST || "http://localhost:8089",
-  // "https://egov-micro-dev.egovernments.org",
+  // "https://mseva-uat.lgpunjab.gov.in",
   EGOV_WORKFLOW_TRANSITION_ENDPOINT:
     process.env.EGOV_WORKFLOW_TRANSITION_PATH ||
     "/egov-workflow-v2/egov-wf/process/_transition",
@@ -57,8 +57,8 @@ const envVariables = {
   EGOV_LOCATION_BOUNDARY_TYPE_CODE: process.env.EGOV_BOUNDARY || "Locality",
 
   //user service configurations
-  EGOV_USER_HOST: process.env.EGOV_USER_HOST || "http://localhost:8088",
-  //"https://egov-micro-dev.egovernments.org",
+  EGOV_USER_HOST: process.env.EGOV_USER_HOST || "http://localhost:8081",
+  //"https://mseva-uat.lgpunjab.gov.in",
   EGOV_USER_CONTEXT_PATH: process.env.EGOV_USER_CONTEXT_PATH || "/user",
   EGOV_USER_CREATE_ENDPOINT:
     process.env.EGOV_USER_CREATE_ENDPOINT || "/users/_createnovalidate",
@@ -85,14 +85,14 @@ const envVariables = {
 
   //mdms service configurations
   EGOV_MDMS_HOST:
-    process.env.EGOV_MDMS_HOST || "https://egov-micro-dev.egovernments.org",
+    process.env.EGOV_MDMS_HOST || "https://mseva-uat.lgpunjab.gov.in",
   EGOV_MDMS_CONTEXT_PATH:
     process.env.EGOV_MDMS_CONTEXT_PATH || "/egov-mdms-service/v1",
   EGOV_MDMS_SEARCH_ENPOINT: process.env.EGOV_MDMS_SEARCH_ENPOINT || "/_search",
 
   //event service configurations
   EGOV_EVENT_HOST:
-    process.env.EGOV_EVENT_HOST || "https://egov-micro-dev.egovernments.org",
+    process.env.EGOV_EVENT_HOST || "https://mseva-uat.lgpunjab.gov.in",
   EGOV_EVENT_CONTEXT_PATH:
     process.env.EGOV_EVENT_CONTEXT_PATH || "/egov-user-event/v1/events",
   EGOV_EVENT_CREATE_ENPOINT:
@@ -110,7 +110,7 @@ const envVariables = {
 
   //property service configurations
   EGOV_PROPERTY_HOST:
-    process.env.EGOV_PROPERTY_HOST || "https://egov-micro-dev.egovernments.org",
+    process.env.EGOV_PROPERTY_HOST || "https://mseva-uat.lgpunjab.gov.in",
   EGOV_PROPERTY_CONTEXT_PATH:
     process.env.EGOV_PROPERTY_CONTEXT_PATH || "/pt-services-v2/property",
   EGOV_PROPERTY_SEARCH_ENPOINT:
@@ -119,7 +119,7 @@ const envVariables = {
   //localization service configurations
   EGOV_LOCALIZATION_HOST:
     process.env.EGOV_LOCALIZATION_HOST ||
-    "https://egov-micro-dev.egovernments.org",
+    "https://mseva-uat.lgpunjab.gov.in",
   EGOV_LOCALIZATION_CONTEXT_PATH:
     process.env.EGOV_LOCALIZATION_CONTEXT_PATH || "/localization/messages/v1",
   EGOV_LOCALIZATION_SEARCH_ENPOINT:

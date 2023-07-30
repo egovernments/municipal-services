@@ -21,7 +21,6 @@ const fireNOCRowMapper = async (row, mapper = {}) => {
   fireNoc.provisionFireNOCNumber = row.provisionfirenocnumber;
   fireNoc.oldFireNOCNumber = row.oldfirenocnumber;
   fireNoc.dateOfApplied = intConversion(row.dateofapplied);
-  fireNoc.IsLegacy=row.islegacy;
   let auditDetails = {
     createdBy: row.createdby,
     lastModifiedBy: row.lastmodifiedby,
@@ -61,10 +60,6 @@ const fireNOCRowMapper = async (row, mapper = {}) => {
         addressNumber: row.paddressNumber,
         buildingName: row.pbuildingname,
         city: row.pcity,
-        areaType:row.pareatype,
-        subDistrict:row.psubdistrict,
-        addressLine2:row.addressline2,
-        landmark:row.landmark,
         locality: {
           code: row.plocality
         },
@@ -95,22 +90,23 @@ const fireNocOwnersRowMapper = async (row, mapper = []) => {
     userName: row.username,
     useruuid: row.useruuid,
     active: row.active,
-    ownerType: row.ownertype,
+    ownerType: row.applicantcategory,
     relationship: row.relationship,
     tenantId: row.tenantId,
     fatherOrHusbandName: ""
   };
+
   if (ownerIndex != -1) {
     mapper[ownerIndex] = {
       ...ownerObject,
       ...mapper[ownerIndex]
     };
+    mapper[ownerIndex].ownerType = row.applicantcategory;
   } else {
     let user = {};
     if (row.useruuid) {
       user = await searchUser(requestInfo, row.useruuid);
     }
-    // console.info("user",user);
     user = {
       ...ownerObject,
       ...user
@@ -127,16 +123,8 @@ const fireNocBuildingsRowMapper = (row, mapper = []) => {
     tenantId: row.tenantid,
     name: row.buildingname,
     usageType: row.usagetype,
-    usageSubType:row.usagesubtype,
     uoms: fireNocUomsRowMapper(row),
-    applicationDocuments: fireNocApplicationDocumentsRowMapper(row),
-    landArea: intConversion(row.landarea),
-    totalCoveredArea:intConversion(row.totalcoveredarea),
-    parkingArea:intConversion(row.parkingarea),
-    leftSurrounding:row.leftsurrounding,
-    rightSurrounding:row.rightsurrounding,
-    frontSurrounding:row.frontsurrounding,
-    backSurrounding:row.backsurrounding
+    applicationDocuments: fireNocApplicationDocumentsRowMapper(row)
   };
   if (buildingIndex != -1) {
     buildingObject.uoms = fireNocUomsRowMapper(
@@ -238,3 +226,14 @@ export const searchByMobileNumber = async (mobileNumber, tenantId) => {
   );
   return userSearchResponse;
 };
+
+export const mapIDsToList = response => {
+  let result = [];
+
+  for (var i = 0; i < response.length; i++) {
+    result.push(response[i].fid);
+  }
+  console.log(result);
+  return result;
+}
+

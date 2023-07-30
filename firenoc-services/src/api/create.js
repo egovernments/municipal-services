@@ -20,6 +20,8 @@ export default ({ config }) => {
     "/_create",
     asyncHandler(async ({ body }, res, next) => {
       let response = await createApiResponse({ body }, res, next);
+      if(response.Errors)
+        res.status(400);
       res.json(response);
     })
   );
@@ -45,20 +47,19 @@ export const createApiResponse = async ({ body }, res, next) => {
   //model validator
   let errors = validateFireNOCModel(body, mdms);
   if (errors.length > 0) {
-   next ({
+    next({
       errorType: "custom",
-      status:400, 
       errorReponse: {
-        ResponseInfo: requestInfoToResponseInfo({...body.RequestInfo, status:"failed"}, false),
+        ResponseInfo: requestInfoToResponseInfo(body.RequestInfo, true),
         Errors: errors
       }
     });
-    
+    return;
   }
 
   // console.log(JSON.stringify(mdms));
   body = await addUUIDAndAuditDetails(body, "_create");
-  console.log("Created Body:  "+JSON.stringify(body));
+  //console.log("Created Body:  "+JSON.stringify(body));
   let workflowResponse = await createWorkFlow(body);
   // console.log(JSON.stringify(workflowResponse));
 
