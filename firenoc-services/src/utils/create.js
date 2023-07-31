@@ -6,7 +6,9 @@ import isEmpty from "lodash/isEmpty";
 import { status } from "./search";
 
 export const addUUIDAndAuditDetails = async (request, method = "_update") => {
+  console.log("method-->", method);
   let { FireNOCs, RequestInfo } = request;
+
   //for loop should be replaced new alternative
   for (var i = 0; i < FireNOCs.length; i++) {
     let id = get(FireNOCs[i], "id");
@@ -217,5 +219,6 @@ export const updateStatus = (FireNOCs, workflowResponse) => {
       workflowStatus[firenoc.fireNOCDetails.applicationNumber];
     return firenoc;
   });
+  console.log('FireNOCs :--------->',FireNOCs)
   return FireNOCs;
 };
