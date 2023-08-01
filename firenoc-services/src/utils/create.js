@@ -91,24 +91,29 @@ export const addUUIDAndAuditDetails = async (request, method = "_update") => {
         userSearchReqCriteria.mobileNumber = owners[owneriter].mobileNumber;
         userSearchReqCriteria.name = owners[owneriter].name;
         userSearchReqCriteria.tenantId = envVariables.EGOV_DEFAULT_STATE_ID;
-
         userSearchResponse = await userService.searchUser(
           RequestInfo,
           userSearchReqCriteria
         );
+
+        
         
         if (get(userSearchResponse, "user", []).length > 0) {
+          console.log("user is aleardy exist",userSearchResponse.user[0]);
         userResponse = await userService.updateUser(RequestInfo, {
         ...userSearchResponse.user[0],
         ...owners[owneriter]
         });
+         console.log("updated user response",userResponse);
         }
         else{
+          console.log("user not found ceating new one");
           userResponse = await createUser(
             RequestInfo,
             owners[owneriter],
             envVariables.EGOV_DEFAULT_STATE_ID
           );
+          console.log("new user created ",userResponse);
         }
 
         let ownerUUID = get(owners[owneriter], "ownerUUID");
@@ -147,11 +152,13 @@ const createUser = async (requestInfo, owner, tenantId) => {
     //uuid of user not present
     userSearchReqCriteria.userType = "CITIZEN";
     userSearchReqCriteria.tenantId = tenantId;
+    userSearchReqCriteria.name = owner.name;
     userSearchReqCriteria.mobileNumber = owner.mobileNumber;
     userSearchResponse = await userService.searchUser(
       requestInfo,
       userSearchReqCriteria
     );
+    console.log("user search length",get(userSearchResponse, "user", []).length);
     if (get(userSearchResponse, "user", []).length > 0) {
       //assign to user
 
@@ -160,7 +167,7 @@ const createUser = async (requestInfo, owner, tenantId) => {
         ...owner
       });
     } else {
-      // console.log("user not found");
+       console.log("user not found");
 
       owner = addDefaultUserDetails(tenantId, owner);
       // console.log("userSearchResponse.user[0]", userSearchResponse.user[0]);
@@ -169,7 +176,7 @@ const createUser = async (requestInfo, owner, tenantId) => {
         ...userSearchResponse.user[0],
         ...owner
       });
-      // console.log("Create passed");
+      console.log("Create passed");
     }
   } else {
     //uuid present
@@ -277,6 +284,7 @@ const getUUidFromUserName = async (owners, RequestInfo) => {
     let userSearchResponse = {};
 
     userSearchReqCriteria.userName = mobileNumber;
+    userSearchReqCriteria.name = owner.name;
     userSearchReqCriteria.tenantId = envVariables.EGOV_DEFAULT_STATE_ID;
 
     userSearchResponse = await userService.searchUser(
