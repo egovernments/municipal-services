@@ -152,8 +152,7 @@ const createUser = async (requestInfo, owner, tenantId) => {
     //uuid of user not present
     userSearchReqCriteria.userType = "CITIZEN";
     userSearchReqCriteria.tenantId = tenantId;
-    userSearchReqCriteria.name = owner.name;
-    userSearchReqCriteria.mobileNumber = owner.mobileNumber;
+    userSearchReqCriteria.userName = owner.mobileNumber;
     userSearchResponse = await userService.searchUser(
       requestInfo,
       userSearchReqCriteria
@@ -284,7 +283,6 @@ const getUUidFromUserName = async (owners, RequestInfo) => {
     let userSearchResponse = {};
 
     userSearchReqCriteria.userName = mobileNumber;
-    userSearchReqCriteria.name = owner.name;
     userSearchReqCriteria.tenantId = envVariables.EGOV_DEFAULT_STATE_ID;
 
     userSearchResponse = await userService.searchUser(
