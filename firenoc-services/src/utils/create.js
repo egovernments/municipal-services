@@ -5,6 +5,7 @@ import userService from "../services/userService";
 import isEmpty from "lodash/isEmpty";
 import { status } from "./search";
 
+
 export const addUUIDAndAuditDetails = async (request, method = "_update") => {
   let { FireNOCs, RequestInfo } = request;
   //for loop should be replaced new alternative
@@ -108,7 +109,7 @@ export const addUUIDAndAuditDetails = async (request, method = "_update") => {
         }
         else{
           console.log("user not found ceating new one");
-          userResponse = await createUser(
+          userResponse = await createUser( 
             RequestInfo,
             owners[owneriter],
             envVariables.EGOV_DEFAULT_STATE_ID
@@ -152,6 +153,8 @@ const createUser = async (requestInfo, owner, tenantId) => {
     //uuid of user not present
     userSearchReqCriteria.userType = "CITIZEN";
     userSearchReqCriteria.tenantId = tenantId;
+    userSearchReqCriteria.name = owner.name;
+    userSearchReqCriteria.gender=owner.gender;
     userSearchReqCriteria.userName = owner.mobileNumber;
     userSearchResponse = await userService.searchUser(
       requestInfo,
@@ -166,19 +169,16 @@ const createUser = async (requestInfo, owner, tenantId) => {
         ...owner
       });
     } else {
-       console.log("user not found");
 
       owner = addDefaultUserDetails(tenantId, owner);
-      // console.log("userSearchResponse.user[0]", userSearchResponse.user[0]);
-      // console.log("owner", owner);
+ 
       userCreateResponse = await userService.createUser(requestInfo, {
         ...userSearchResponse.user[0],
         ...owner
       });
-      console.log("Create passed");
+
     }
   } else {
-    //uuid present
     userSearchReqCriteria.uuid = [owner.uuid];
     userSearchResponse = await userService.searchUser(
       requestInfo,
@@ -189,7 +189,6 @@ const createUser = async (requestInfo, owner, tenantId) => {
         ...userSearchResponse.user[0],
         ...owner
       });
-      // console.log("Update passed");
     }
   }
   return userCreateResponse;
@@ -219,7 +218,7 @@ const checkApproveRecord = async (fireNoc = {}, RequestInfo) => {
 
 const addDefaultUserDetails = (tenantId, owner) => {
   if (!owner.userName || isEmpty(owner.userName))
-    owner.userName = owner.mobileNumber;
+    owner.userName = uuidv1()+owner.name;
   owner.active = true;
   owner.tenantId = envVariables.EGOV_DEFAULT_STATE_ID;
   owner.type = "CITIZEN";
@@ -283,6 +282,8 @@ const getUUidFromUserName = async (owners, RequestInfo) => {
     let userSearchResponse = {};
 
     userSearchReqCriteria.userName = mobileNumber;
+    userSearchReqCriteria.name= owner.name;
+    userSearchReqCriteria.gender = owner.gender;
     userSearchReqCriteria.tenantId = envVariables.EGOV_DEFAULT_STATE_ID;
 
     userSearchResponse = await userService.searchUser(
@@ -295,6 +296,7 @@ const getUUidFromUserName = async (owners, RequestInfo) => {
     }
 
   }
+
   let uuidsSet = [...new Set(uuids)];
 
   return uuidsSet;
