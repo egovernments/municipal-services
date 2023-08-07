@@ -206,7 +206,7 @@ const calculateNOCFee = async (
       let fullrate = Number(billingslabs[0].rate);
           if (calculateCriteria.fireNOC.fireNOCDetails.fireNOCType === "PROVISIONAL")
             buidingnocfee= Math.round((fullrate * billingslabs[0].provisional_percentage) / 100.0);
-          else if (calculateCriteria.fireNOC.fireNOCDetails.fireNOCType === "RENEWAL")
+          else if (calculateCriteria.fireNOC.fireNOCDetails.fireNOCType === "RENEWAL" || calculateCriteria.fireNOC.fireNOCDetails.fireNOCType === "RENEW")
             buidingnocfee= Math.round((fullrate * billingslabs[0].renew_percentage) / 100.0);
           else
             buidingnocfee= Math.round((fullrate * billingslabs[0].new_percentage) / 100.0);
@@ -218,6 +218,7 @@ const calculateNOCFee = async (
                     area = AREA_SQYD;
                 else
                     area = AREA_ACRE;
+                    
                     let fullrate = Number(billingslabs[0].rate);
                     let fee_per_unit = Number(billingslabs[0].feeperunitrate);
     
@@ -235,12 +236,12 @@ const calculateNOCFee = async (
     
                    if (calculateCriteria.fireNOC.fireNOCDetails.fireNOCType === "PROVISIONAL")
                    buidingnocfee= Math.round((fee * billingslabs[0].provisional_percentage) / 100.0);
-                    else if (calculateCriteria.fireNOC.fireNOCDetails.fireNOCType === "RENEW")
+                    else if (calculateCriteria.fireNOC.fireNOCDetails.fireNOCType === "RENEWAL" || calculateCriteria.fireNOC.fireNOCDetails.fireNOCType === "RENEW")
                     buidingnocfee= Math.round((fee * billingslabs[0].renew_percentage) / 100.0);
                     else
                     buidingnocfee= Math.round((fee * billingslabs[0].new_percentage) / 100.0);
 
-}
+      }
   //     if (mdmsConfig.CALCULATON_TYPE === "FLAT") {
   //       buidingnocfee += Number(billingslabs[0].rate);
   //     } else {
