@@ -98,6 +98,9 @@ public class Property extends PropertyInfo {
 	
 	@JsonProperty("auditDetails")
 	private AuditDetails auditDetails;
+	
+	@JsonProperty("locality")
+	private Locality locality;
 
 	@JsonProperty("workflow")
 	@DiffIgnore
