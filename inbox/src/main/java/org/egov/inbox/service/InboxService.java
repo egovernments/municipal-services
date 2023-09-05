@@ -335,14 +335,13 @@ public class InboxService {
                 }
             }
 
-			/*
-			 * if (!ObjectUtils.isEmpty(processCriteria.getModuleName()) &&
-			 * processCriteria.getModuleName().equalsIgnoreCase(FSMConstants.FSM_MODULE)) {
-			 * 
-			 * totalCount = fsmInboxFilter.fetchApplicationCountFromSearcher(criteria,
-			 * StatusIdNameMap, requestInfo, dsoId); }
-			 */
-            
+            if (!ObjectUtils.isEmpty(processCriteria.getModuleName()) &&
+                    processCriteria.getModuleName().equalsIgnoreCase(FSMConstants.FSM_MODULE)) {
+
+                totalCount = fsmInboxFilter.fetchApplicationCountFromSearcher(criteria,
+                        StatusIdNameMap, requestInfo, dsoId);
+            }
+
             if (processCriteria != null && !ObjectUtils.isEmpty(processCriteria.getModuleName())
                     && processCriteria.getModuleName().equals(BPA)) {
                 totalCount = bpaInboxFilterService.fetchApplicationCountFromSearcher(criteria, StatusIdNameMap, requestInfo);
