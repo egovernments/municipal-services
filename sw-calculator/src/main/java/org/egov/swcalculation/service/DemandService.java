@@ -729,10 +729,10 @@ List<Demand> demands=res.getDemands();
 			int generateDemandToIndex = IntStream.range(0, taxPeriods.size())
 				     .filter(p -> taxPeriodFrom.equals(taxPeriods.get(p).getFromDate()))
 				     .findFirst().getAsInt();
-			
+			String cone=requestInfo.getKey();
 			log.info("Billing master data values for non metered connection:: {}", master);
 			List<SewerageDetails> connectionNos = sewerageCalculatorDao.getConnectionsNoList(tenantId,
-					SWCalculationConstant.nonMeterdConnection, taxPeriodFrom, taxPeriodTo);
+					SWCalculationConstant.nonMeterdConnection, taxPeriodFrom, taxPeriodTo, cone);
 
 			//Generate bulk demands for connections in below count
 			int bulkSaveDemandCount = configs.getBulkSaveDemandCount() != null ? configs.getBulkSaveDemandCount() : 1;
