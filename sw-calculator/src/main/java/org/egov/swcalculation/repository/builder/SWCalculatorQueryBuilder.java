@@ -35,7 +35,7 @@ public class SWCalculatorQueryBuilder {
 		return distinctTenantIdsCriteria;
 	}
 
-	public String getConnectionNumberList(String tenantId, String connectionType, String status, Long taxPeriodFrom, Long taxPeriodTo, List<Object> preparedStatement) {
+	public String getConnectionNumberList(String tenantId, String connectionType, String status, Long taxPeriodFrom, Long taxPeriodTo, String cone, List<Object> preparedStatement) {
 		StringBuilder query = new StringBuilder(connectionNoListQuery);
 		// Add connection type
 		addClauseIfRequired(preparedStatement, query);
@@ -65,7 +65,12 @@ public class SWCalculatorQueryBuilder {
 		//Add not null condition
 		addClauseIfRequired(preparedStatement, query);
 		query.append(" conn.connectionno is not null");
-		
+		 if(cone!=null && cone!="")
+		{
+			addClauseIfRequired(preparedStatement, query);
+			query.append(" conn.connectionno = ? ");
+			preparedStatement.add(cone);
+		}
 		query.append(fetchConnectionsToBeGenerate(tenantId, taxPeriodFrom, taxPeriodTo, preparedStatement));
 
 		return query.toString();
